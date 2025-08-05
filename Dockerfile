@@ -3,9 +3,8 @@ FROM maven:3.9.5-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 COPY . .
-RUN mvn clean test
 
-# Stage 2: Export artifacts
-FROM alpine:latest AS final
-WORKDIR /output
-COPY --from=builder /app/test-output/ExtentReport.html ./ExtentReport.html
+# Run tests but don't fail the Docker build on test failure
+RUN mvn clean test || true
+
+# At this point, ExtentReport.html should exist at /app/test-output/

@@ -1,33 +1,30 @@
-name: Run API Tests in Docker and Upload Report
+name: test
 
 on:
   push:
     branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    continue-on-error: false
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Build Docker image (run tests but don't fail step)
-        id: build
+      - name: Build Docker Image and Run Tests
         run: |
-          docker build -t bookstore-api-tests . || echo "Build failed but continue"
+          docker build -t bookstore-api-tests .
 
-      - name: Extract ExtentReport.html (even if test failed)
-        if: always()
+      - name: Create container and copy ExtentReport.html
         run: |
           container_id=$(docker create bookstore-api-tests)
-          docker cp $container_id:/output/ExtentReport.html ./ExtentReport.html || echo "No report found"
-          docker rm $container_id
+          docker cp "$container_id:/app/test-output/ExtentReport.html" ./ExtentReport.html
+          docker rm "$container_id"
 
-      - name: Upload ExtentReport as artifact
-        if: always()
+      - name: Upload ExtentReport as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReport
