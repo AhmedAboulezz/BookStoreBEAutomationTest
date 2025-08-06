@@ -14,15 +14,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build Docker Image and Run Tests
-        run: |
-          docker build -t bookstore-api-tests .
+      - name: Create a volume for report sharing
+        run: docker volume create bookstore-report-vol
 
-      - name: Create container and copy ExtentReport.html
+      - name: Build Docker Image
+        run: docker build -t bookstore-api-tests .
+
+      - name: Run Tests inside Container with Volume Mount
         run: |
-          container_id=$(docker create bookstore-api-tests)
-          docker cp "$container_id:/app/test-output/ExtentReport.html" ./ExtentReport.html
-          docker rm "$container_id"
+          docker run --rm \
+            -v bookstore-report-vol:/app/test-output \
+            bookstore-api-tests
+
+      - name: Copy ExtentReport.html from volume
+        run: |
+          docker run --rm \
+            -v bookstore-report-vol:/data \
+            -v ${{ github.workspace }}:/output \
+            alpine cp /data/ExtentReport.html /output/ExtentReport.html
 
       - name: Upload ExtentReport as Artifact
         uses: actions/upload-artifact@v4
