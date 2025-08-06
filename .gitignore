@@ -28,11 +28,33 @@ Thumbs.db
 test-output/
 extent-output/
 extent-report.html
+# Ignore testng and report files in test-output
+test-output/*.xml
+test-output/*.html
+test-output/*.css
+test-output/*.js
+test-output/*.png
+test-output/*.gif
+# Ignore junitreports and Default suite folders
+test-output/junitreports/
+test-output/Default suite/
+test-output/Suite/
+
+# Allure results
+/target/allure-results/
+# Surefire reports
+/target/surefire-reports/
+# Test classes
+/target/test-classes/
+# Generated sources
+/target/generated-sources/
+/target/generated-test-sources/
 
 # Runtime files
 *.tmp
 *.swp
-
+*.settings
+*.bak
 # Environment configs
 *.env
 config.properties
