@@ -6,27 +6,19 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import models.Book;
 import org.testng.annotations.Test;
-import specs.ResponseSpecs;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.*;
+import static specs.ResponseSpecs.*;
 
-/**
- * GET /api/v1/Books/{id} – happy & edge cases
- */
 public class GetBookByIdTest extends TestBase {
 
-    /**
-     * 1) Happy path:
-     * curl --location 'https://fakerestapi.azurewebsites.net/api/v1/Books/1' --header 'Accept: text/plain; v=1.0'
-     * Validate status 200 and all fields not null; id == 1.
-     */
-    @Test(description = "GET /Books/1 returns 200 and full book object with non-null fields")
+    @Test(description = "GET /Books/1 -> 200 and full book object with non-null fields")
     public void getBookById_happy() {
         Response resp = BookEndpoints.getBookByIdJson(1);
-        resp.then().spec(ResponseSpecs.ok200());
+        resp.then().spec(ok200());
 
         Book b = resp.as(Book.class);
         assertNotNull(b, "Book response must not be null");
@@ -38,44 +30,37 @@ public class GetBookByIdTest extends TestBase {
         assertNotNull(b.getPublishDate(), "publishDate must not be null");
     }
 
-    /**
-     * 2) Non-numeric id ("a") => 400 + errors.id contains "The value 'a' is not valid."
-     */
-    @Test(description = "GET /Books/a returns 400 with errors.id containing not-valid message")
+    @Test(description = "GET /Books/1 Content-Type contains API version v=1.0")
+    public void getBookById_contentTypeHasVersion() {
+        Response resp = BookEndpoints.getBookByIdJson(1);
+        resp.then().spec(ok200());
+        String contentType = resp.getHeader("Content-Type");
+        assertNotNull(contentType, "Content-Type header should be present");
+        assertTrue(contentType.contains("v=1.0"),
+                "Expected Content-Type to contain API version v=1.0, but was: " + contentType);
+    }
+
+    @Test(description = "GET /Books/a -> 400 with errors.id containing not-valid message")
     public void getBookById_nonNumeric_returns400() {
         Response resp = BookEndpoints.getBookByIdRaw("a");
-        resp.then().spec(ResponseSpecs.badRequest400());
-
+        resp.then().spec(badRequest400());
         assertFirstErrorContains(resp, "id", "The value 'a' is not valid.");
     }
 
-    /**
-     * 3) Negative id => 404 (Not Found) as per your expectation.
-     */
-    @Test(description = "GET /Books/-1 returns 404 Not Found")
+    @Test(description = "GET /Books/-1 -> 404 Not Found")
     public void getBookById_negative_returns404() {
         Response resp = BookEndpoints.getBookByIdJson(-1);
-        resp.then().spec(ResponseSpecs.notFound404());
+        resp.then().spec(notFound404());
     }
 
-    /**
-     * 4) Non-existent id (e.g., 201) => 404 (Not Found).
-     */
-    @Test(description = "GET /Books/201 returns 404 Not Found for non-existent book")
+    @Test(description = "GET /Books/201 -> 404 Not Found for non-existent book")
     public void getBookById_notExisting_returns404() {
         Response resp = BookEndpoints.getBookByIdJson(201);
-        resp.then().spec(ResponseSpecs.notFound404());
+        resp.then().spec(notFound404());
     }
 
     // ---------- helpers ----------
 
-    /**
-     * Assert that the first error under 'errors.<key>' contains expectedSubstring.
-     * Expects a validation error payload like:
-     * {
-     *   "errors": { "<key>": [ "message1", ... ] }
-     * }
-     */
     private static void assertFirstErrorContains(Response resp, String key, String expectedSubstring) {
         JsonPath jp = resp.jsonPath();
         Map<String, List<String>> errors = jp.getMap("errors");

@@ -7,7 +7,7 @@ import java.util.Properties;
 public class ConfigurationManager {
 
     private static ConfigurationManager instance;
-    private final Properties properties = new Properties();
+    private final static Properties properties = new Properties();
 
     private ConfigurationManager() {
         try {
@@ -15,7 +15,7 @@ public class ConfigurationManager {
             FileInputStream input = new FileInputStream(configPath);
             properties.load(input);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load configuration file", e);
+            System.err.println("Warning: config.properties not found or failed to load. Relying on environment variables.");
         }
     }
 
@@ -30,19 +30,16 @@ public class ConfigurationManager {
         return instance;
     }
 
-    public String get(String key) {
-        String envValue = System.getenv(key);
-        if (envValue != null) return envValue;
+    public static String get(String key) {
+        // Convert "base.url" to "BASE_URL"
+        String envKey = key.toUpperCase().replace(".", "_");
+        String envValue = System.getenv(envKey);
+        if (envValue != null && !envValue.isEmpty()) return envValue;
 
         return properties.getProperty(key);
     }
 
-    public String getBaseUrl() {
+    public static String getBaseUrl() {
         return get("base.url");
     }
-
-    public int getTimeout() {
-        return Integer.parseInt(get("timeout"));
-    }
-
 }

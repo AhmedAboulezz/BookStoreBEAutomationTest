@@ -19,7 +19,6 @@ public class ExtentTestListener implements ITestListener {
 
     @Override
     public void onStart(ITestContext context) {
-    	System.out.println(">>>> Found test classes: " + Arrays.toString(context.getAllTestMethods()));
         ExtentSparkReporter sparkReporter = new ExtentSparkReporter("test-output/ExtentReport.html");
         sparkReporter.config().setDocumentTitle("Bookstore API Report");
         sparkReporter.config().setReportName("API Test Results");
@@ -29,7 +28,6 @@ public class ExtentTestListener implements ITestListener {
         extent.attachReporter(sparkReporter);
         extent.setSystemInfo("Tester", "Ahmed Aboelezz");
 
-        // Shutdown hook for safety
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (extent != null) {
                 extent.flush();
@@ -60,7 +58,6 @@ public class ExtentTestListener implements ITestListener {
 
     @Override
     public void onFinish(ITestContext context) {
-    	System.out.println(">>> Flushing extent");
         extent.flush();
     }
     

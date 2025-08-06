@@ -31,20 +31,5 @@ public class TestBase {
         RestAssured.baseURI = ConfigurationManager.getInstance().getBaseUrl();
     }
     
-    protected void logInfo(String message) {
-        if (ExtentTestListener.getTest() != null)
-            ExtentTestListener.getTest().log(Status.INFO, message);
-    }
-
-    protected void logPass(String message) {
-        if (ExtentTestListener.getTest() != null)
-            ExtentTestListener.getTest().pass(message);
-    }
-
-    protected void logFail(String message) {
-        if (ExtentTestListener.getTest() != null)
-            ExtentTestListener.getTest().fail(message);
-    }
-    
     
 }

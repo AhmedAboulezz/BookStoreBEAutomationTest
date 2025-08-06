@@ -17,10 +17,10 @@ public class Author {
     private Integer idBook;
 
     @JsonProperty("firstName")
-    private String firstName; // nullable
+    private String firstName;
 
     @JsonProperty("lastName")
-    private String lastName; // nullable
+    private String lastName;
 
     public Author() {}
 
@@ -44,30 +44,5 @@ public class Author {
     public String getLastName() { return lastName; }
     public Author setLastName(String lastName) { this.lastName = lastName; return this; }
 
-    // equals/hashCode/toString
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Author)) return false;
-        Author author = (Author) o;
-        return Objects.equals(id, author.id) &&
-               Objects.equals(idBook, author.idBook) &&
-               Objects.equals(firstName, author.firstName) &&
-               Objects.equals(lastName, author.lastName);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, idBook, firstName, lastName);
-    }
-
-    @Override
-    public String toString() {
-        return "Author{" +
-                "id=" + id +
-                ", idBook=" + idBook +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                '}';
-    }
 }

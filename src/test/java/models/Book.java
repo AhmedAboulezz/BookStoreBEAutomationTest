@@ -15,19 +15,19 @@ public class Book {
     private Integer id;
 
     @JsonProperty("title")
-    private String title; // nullable
+    private String title; 
 
     @JsonProperty("description")
-    private String description; // nullable
+    private String description;
 
     @JsonProperty("pageCount")
     private Integer pageCount;
 
     @JsonProperty("excerpt")
-    private String excerpt; // nullable
+    private String excerpt;
 
     @JsonProperty("publishDate")
-    private OffsetDateTime publishDate; // format: date-time
+    private OffsetDateTime publishDate; 
 
     public Book() {}
 
@@ -59,34 +59,4 @@ public class Book {
     public OffsetDateTime getPublishDate() { return publishDate; }
     public Book setPublishDate(OffsetDateTime publishDate) { this.publishDate = publishDate; return this; }
 
-    // equals/hashCode/toString
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Book)) return false;
-        Book book = (Book) o;
-        return Objects.equals(id, book.id) &&
-               Objects.equals(title, book.title) &&
-               Objects.equals(description, book.description) &&
-               Objects.equals(pageCount, book.pageCount) &&
-               Objects.equals(excerpt, book.excerpt) &&
-               Objects.equals(publishDate, book.publishDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, title, description, pageCount, excerpt, publishDate);
-    }
-
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", pageCount=" + pageCount +
-                ", excerpt='" + excerpt + '\'' +
-                ", publishDate=" + "2025-08-04T14:26:00.228Z" +
-                '}';
-    }
 }

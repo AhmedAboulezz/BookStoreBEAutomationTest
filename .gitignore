@@ -1,17 +1,49 @@
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-# https://maven.apache.org/wrapper/#usage-without-binary-jar
-.mvn/wrapper/maven-wrapper.jar
+# Maven target directory
+/target/
 
-# Eclipse m2e generated files
-# Eclipse Core
-.project
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
+# Logs
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# Eclipse
+*.classpath
+*.project
+*.settings/
+.apt_generated/
+.factorypath
+
+# VS Code
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Test output
+test-output/
+extent-output/
+extent-report.html
+
+# Runtime files
+*.tmp
+*.swp
+
+# Environment configs
+*.env
+config.properties
+
+# Docker
+*.pid
+*.tar
+*.bak
+docker-compose.override.yml
+
+# Build artifacts
+*.jar
+*.war
+*.ear

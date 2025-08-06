@@ -1,33 +1,70 @@
 package endpoints;
 
 import io.restassured.response.Response;
+
 import static io.restassured.RestAssured.given;
+import static specs.RequestSpecs.jsonV10;
 
-public class AuthorEndpoints {
+import config.ConfigurationManager;
 
-    private static final String BASE_PATH = "/api/v1/Authors";
+public final class AuthorEndpoints {
+    private AuthorEndpoints() {}
+
+    private static final String AUTHORS = ConfigurationManager.getBaseUrl()+"/Authors";
 
     public static Response getAllAuthors() {
-        return given().when().get(BASE_PATH);
+        return given()
+                .spec(jsonV10())
+        .when()
+                .get(AUTHORS)
+        .then()
+                .extract().response();
     }
-
-    public static Response getAuthorById(int id) {
-        return given().when().get(BASE_PATH + "/" + id);
-    }
-
-    public static Response createAuthor(Object payload) {
-        return given().body(payload).when().post(BASE_PATH);
-    }
-
-    public static Response updateAuthor(int id, Object payload) {
-        return given().body(payload).when().put(BASE_PATH + "/" + id);
-    }
-
+    
     public static Response deleteAuthor(int id) {
-        return given().when().delete(BASE_PATH + "/" + id);
+        return given()
+                .spec(jsonV10())
+                .pathParam("id", id)
+        .when()
+                .delete(AUTHORS + "/{id}")
+        .then()
+                .extract().response();
     }
 
-    public static Response getAuthorsByBookId(int bookId) {
-        return given().when().get(BASE_PATH + "/authors/books/" + bookId);
+    public static Response deleteAuthorRawPath(String idLiteral) {
+        return given()
+                .spec(jsonV10())
+        .when()
+                .delete(AUTHORS + "/" + idLiteral)
+        .then()
+                .extract().response();
+    }
+
+    public static Response deleteAuthorsCollection() {
+        return given()
+                .spec(jsonV10())
+        .when()
+                .delete(AUTHORS)
+        .then()
+                .extract().response();
+    }
+    
+    public static Response getAuthorByIdJson(int id) {
+        return given()
+                .spec(jsonV10())
+                .pathParam("id", id)
+        .when()
+                .get(AUTHORS + "/{id}")
+        .then()
+                .extract().response();
+    }
+
+    public static Response getAuthorByIdRaw(String idLiteral) {
+        return given()
+                .spec(jsonV10())
+        .when()
+                .get(AUTHORS + "/" + idLiteral)
+        .then()
+                .extract().response();
     }
 }
