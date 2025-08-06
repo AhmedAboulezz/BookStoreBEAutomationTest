@@ -3,7 +3,7 @@
 <suite name="Suite">
 <listeners>
     <listener class-name="base.ExtentTestListener"/>
-</listene
+</listeners>
   <test thread-count="5" name="Test">
     <classes>
       <class name="tests.books.GetBooksTest"/>
