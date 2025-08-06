@@ -1,20 +1,19 @@
 package tests.books;
 
 import base.TestBase;
+import dataproviders.BookDataProviders;
 import endpoints.BookEndpoints;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import models.Book;
 import org.testng.annotations.Test;
-
-import java.util.List;
-import java.util.Map;
+import utils.helpers;
 
 import static org.testng.Assert.*;
 import static specs.ResponseSpecs.*;
 
 public class GetBookByIdTest extends TestBase {
 
+    // ---- Specific “happy” test that also validates fields ----
     @Test(description = "GET /Books/1 -> 200 and full book object with non-null fields")
     public void getBookById_happy() {
         Response resp = BookEndpoints.getBookByIdJson(1);
@@ -40,36 +39,31 @@ public class GetBookByIdTest extends TestBase {
                 "Expected Content-Type to contain API version v=1.0, but was: " + contentType);
     }
 
-    @Test(description = "GET /Books/a -> 400 with errors.id containing not-valid message")
-    public void getBookById_nonNumeric_returns400() {
-        Response resp = BookEndpoints.getBookByIdRaw("a");
+    // ---- Parameterized: numeric ids (happy + 404s) ----
+    @Test(
+        dataProvider = "bookIdNumericCases",
+        dataProviderClass = BookDataProviders.class,
+        description = "Numeric id cases for GET /Books/{id}"
+    )
+    public void getBookById_numericCases(int id, int expectedStatus) {
+        Response resp = BookEndpoints.getBookByIdJson(id);
+        switch (expectedStatus) {
+            case 200 -> resp.then().spec(ok200());
+            case 400 -> resp.then().spec(badRequest400());
+            case 404 -> resp.then().spec(notFound404());
+            default  -> assertEquals(resp.getStatusCode(), expectedStatus, "Unexpected status");
+        }
+    }
+
+    // ---- Parameterized: non-numeric ids -> 400 + errors.<key> ----
+    @Test(
+        dataProvider = "bookIdStringCases",
+        dataProviderClass = BookDataProviders.class,
+        description = "Non-numeric id cases for GET /Books/{id}"
+    )
+    public void getBookById_stringCases(String idAsString, String errorKey, String expectedMessageContains) {
+        Response resp = BookEndpoints.getBookByIdRaw(idAsString);
         resp.then().spec(badRequest400());
-        assertFirstErrorContains(resp, "id", "The value 'a' is not valid.");
-    }
-
-    @Test(description = "GET /Books/-1 -> 404 Not Found")
-    public void getBookById_negative_returns404() {
-        Response resp = BookEndpoints.getBookByIdJson(-1);
-        resp.then().spec(notFound404());
-    }
-
-    @Test(description = "GET /Books/201 -> 404 Not Found for non-existent book")
-    public void getBookById_notExisting_returns404() {
-        Response resp = BookEndpoints.getBookByIdJson(201);
-        resp.then().spec(notFound404());
-    }
-
-    // ---------- helpers ----------
-
-    private static void assertFirstErrorContains(Response resp, String key, String expectedSubstring) {
-        JsonPath jp = resp.jsonPath();
-        Map<String, List<String>> errors = jp.getMap("errors");
-        assertNotNull(errors, "'errors' object should be present in the response");
-        List<String> msgs = errors.get(key);
-        assertNotNull(msgs, "'errors." + key + "' should be present");
-        assertFalse(msgs.isEmpty(), "'errors." + key + "' should have at least one message");
-        String first = msgs.get(0);
-        assertTrue(first.contains(expectedSubstring),
-                "Expected first error for '" + key + "' to contain: " + expectedSubstring + " but was: " + first);
+        helpers.assertFirstErrorContains(resp, errorKey, expectedMessageContains);
     }
 }

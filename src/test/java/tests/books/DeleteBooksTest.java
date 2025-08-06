@@ -1,63 +1,45 @@
 package tests.books;
 
 import base.TestBase;
+import dataproviders.BookDataProviders;
 import endpoints.BookEndpoints;
-
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
+import utils.helpers;
 
-import static org.testng.Assert.*;
-import static specs.ResponseSpecs.*; 
+import static specs.ResponseSpecs.*;
 
 public class DeleteBooksTest extends TestBase {
 
-    private static void assertErrorsIdEquals(Response resp, String expected) {
-        String actual = resp.jsonPath().getString("errors.id[0]");
-        assertEquals(actual, expected, "errors.id[0] mismatch");
+    @Test(
+        dataProvider = "deleteBookNumericCases",
+        dataProviderClass = BookDataProviders.class,
+        description = "DELETE /Books/{id} numeric id scenarios"
+    )
+    public void delete_numericCases(int id, int expectedStatus) {
+        Response resp = BookEndpoints.deleteBook(id);
+        switch (expectedStatus) {
+            case 200 -> resp.then().spec(ok200());
+            case 400 -> resp.then().spec(badRequest400());
+            case 404 -> resp.then().spec(notFound404());
+            default  -> throw new AssertionError("Unexpected expectedStatus: " + expectedStatus);
+        }
     }
 
-    @Test(description = "DELETE id=1 -> 200")
-    public void delete_id1_200() {
-        Response resp = BookEndpoints.deleteBook(1);
-        resp.then().spec(ok200());
-    }
-
-
-    @Test(description = "DELETE negative id -> 400")
-    public void delete_negativeId_400() {
-        Response resp = BookEndpoints.deleteBook(-1);
+    @Test(
+        dataProvider = "deleteBookStringCases",
+        dataProviderClass = BookDataProviders.class,
+        description = "DELETE /Books/{id} string/overflow id scenarios -> 400 + errors.id"
+    )
+    public void delete_stringCases(String idAsString, String expectedErrorEquals) {
+        Response resp = BookEndpoints.deleteBookRawPath(idAsString);
         resp.then().spec(badRequest400());
+        helpers.assertErrorsIdEquals(resp, expectedErrorEquals);
     }
 
-
-    @Test(description = "DELETE with string id -> 400 and errors.id asserted")
-    public void delete_stringId_400_and_errorsId() {
-        String bad = "abc";
-        Response resp = BookEndpoints.deleteBookRawPath(bad);
-        resp.then().spec(badRequest400());
-        assertErrorsIdEquals(resp, "The value '" + bad + "' is not valid.");
-    }
-
-
-    @Test(description = "DELETE without id -> 405")
+    @Test(description = "DELETE /Books (no id) -> 405 Method Not Allowed")
     public void delete_withoutId_405() {
         Response resp = BookEndpoints.deleteBooksCollection();
         resp.then().spec(methodNotAllowed405());
-    }
-
-
-    @Test(description = "DELETE id=0 -> 404 (suggested)")
-    public void delete_zeroId_404() {
-        Response resp = BookEndpoints.deleteBook(0);
-        resp.then().spec(notFound404());
-    }
-
-
-    @Test(description = "DELETE huge numeric string -> 400 and errors.id asserted")
-    public void delete_hugeNumericString_400_and_errorsId() {
-        String huge = "999999999999999999999";
-        Response resp = BookEndpoints.deleteBookRawPath(huge);
-        resp.then().spec(badRequest400());
-        assertErrorsIdEquals(resp, "The value '" + huge + "' is not valid.");
     }
 }
