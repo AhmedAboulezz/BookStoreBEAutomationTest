@@ -46,10 +46,15 @@ jobs:
           name: ExtentReport
           path: ./ExtentReport.html
 
+      - name: Move report into folder for GitHub Pages
+        run: |
+          mkdir report-for-pages
+          cp ./ExtentReport.html report-for-pages/
+
       - name: Upload report to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./ExtentReport.html
+          path: ./report-for-pages
           name: github-pages
 
   publish-report:
