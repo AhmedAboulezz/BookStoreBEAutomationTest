@@ -4,16 +4,21 @@
 <listeners>
     <listener class-name="base.ExtentTestListener"/>
 </listeners>
-  <test thread-count="5" name="Test">
-    <classes>
-      <class name="tests.books.GetBooksTest"/>
-      <class name="tests.books.PutBooksTest"/>
-      <class name="tests.books.DeleteBooksTest"/>
-      <class name="tests.books.GetBookByIdTest"/>
-      <class name="tests.books.PostBooksTest"/>
-      <class name="tests.authors.DeleteAuthorsTest"/>
-      <class name="tests.authors.GetAuthorsTest"/>
-      <class name="tests.authors.GetAuthorByIdTest"/>
-    </classes>
-  </test> <!-- Test -->
+    <test  name="Authors">
+        <classes>
+            <class name="tests.authors.DeleteAuthorsTest"/>
+            <class name="tests.authors.GetAuthorByIdTest"/>
+            <class name="tests.authors.GetAuthorsTest"/>
+        </classes>
+    </test>
+
+    <test name="Books">
+        <classes>
+            <class name="tests.books.DeleteBooksTest"/>
+            <class name="tests.books.GetBookByIdTest"/>
+            <class name="tests.books.GetBooksTest"/>
+            <class name="tests.books.PostBooksTest"/>
+            <class name="tests.books.PutBooksTest"/>
+        </classes>
+    </test>
 </suite> <!-- Suite -->
