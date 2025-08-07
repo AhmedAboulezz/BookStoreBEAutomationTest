@@ -11,7 +11,7 @@ public class ConfigurationManager {
 
     private ConfigurationManager() {
         try {
-            String configPath = "src/test/resources/config.properties";
+            String configPath = "src/main/resources/config.properties";
             FileInputStream input = new FileInputStream(configPath);
             properties.load(input);
         } catch (IOException e) {
@@ -31,7 +31,6 @@ public class ConfigurationManager {
     }
 
     public static String get(String key) {
-        // Convert "base.url" to "BASE_URL"
         String envKey = key.toUpperCase().replace(".", "_");
         String envValue = System.getenv(envKey);
         if (envValue != null && !envValue.isEmpty()) return envValue;
