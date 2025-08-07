@@ -4,38 +4,43 @@ import base.TestBase;
 import dataproviders.BookDataProviders;
 import endpoints.BookEndpoints;
 import io.restassured.response.Response;
+import models.Book;
+
 import org.testng.annotations.Test;
 import utils.helpers;
 
 import static org.testng.Assert.*;
 import static specs.ResponseSpecs.*;
 
+import java.time.OffsetDateTime;
+
 public class PutBooksTest extends TestBase {
 
-    @Test(description = "PUT /Books/9 happy path -> 200 & body echoes fields")
-    public void put_happy200_id9() {
-        String payload = """
-            {
-              "id": 9,
-              "title": "string",
-              "description": "string",
-              "pageCount": 3849,
-              "excerpt": "string",
-              "publishDate": "1957-03-04T04:21:06.126Z"
-            }
-            """;
+	@Test(description = "PUT /Books/9 happy path -> 200")
+	public void put_happy200_id9() {
 
-        Response resp = BookEndpoints.updateBookRaw(9, payload);
-        resp.then().spec(ok200());
+	    Book book = new Book()
+	            .setId(9)
+	            .setTitle("string")
+	            .setDescription("string")
+	            .setPageCount(3849)
+	            .setExcerpt("string")
+	            .setPublishDate(
+	                OffsetDateTime.parse("1957-03-04T04:21:06.126Z"));
 
-        var jp = resp.jsonPath();
-        assertEquals((int) jp.getInt("id"), 9);
-        assertEquals(jp.getString("title"), "string");
-        assertEquals(jp.getString("description"), "string");
-        assertEquals((int) jp.getInt("pageCount"), 3849);
-        assertEquals(jp.getString("excerpt"), "string");
-        assertEquals(jp.getString("publishDate"), "1957-03-04T04:21:06.126Z");
-    }
+	    Response resp = BookEndpoints.updateBook(book);
+
+	    resp.then().spec(ok200());
+
+	    var jp = resp.jsonPath();
+	    assertEquals(jp.getInt("id"),          book.getId());
+	    assertEquals(jp.getString("title"),    book.getTitle());
+	    assertEquals(jp.getString("description"), book.getDescription());
+	    assertEquals(jp.getInt("pageCount"),   (int) book.getPageCount());
+	    assertEquals(jp.getString("excerpt"),  book.getExcerpt());
+	    assertEquals(jp.getString("publishDate"),
+	                 book.getPublishDate().toString());
+	}
 
     @Test(
         dataProvider = "putInvalidPayloads",

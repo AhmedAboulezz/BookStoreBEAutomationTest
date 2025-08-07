@@ -1,6 +1,7 @@
 package endpoints;
 
 import io.restassured.response.Response;
+import models.Book;
 import specs.RequestSpecs;
 
 import static io.restassured.RestAssured.given;
@@ -68,12 +69,29 @@ public class BookEndpoints {
                 .delete(BASE_PATH + "/" + idSegment);
     }
 
-    /** DELETE /Books (no id) */
+
     public static Response deleteBooksCollection() {
         return given()
                 .spec(RequestSpecs.jsonV10())
                 .when()
                 .delete(BASE_PATH);
+    }
+    
+
+    public static Response createBook(Book book) {
+        return given()
+                .spec(RequestSpecs.jsonV10())
+                .body(book)              
+            .when()
+                .post(BASE_PATH);
+    }
+
+    public static Response updateBook(Book book) {
+        return given()
+                .spec(RequestSpecs.jsonV10())
+                .body(book)
+            .when()
+                .put(BASE_PATH + "/{id}", book.getId());
     }
 
 

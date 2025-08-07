@@ -13,7 +13,6 @@ import static specs.ResponseSpecs.*;
 
 public class GetBookByIdTest extends TestBase {
 
-    // ---- Specific “happy” test that also validates fields ----
     @Test(description = "GET /Books/1 -> 200 and full book object with non-null fields")
     public void getBookById_happy() {
         Response resp = BookEndpoints.getBookByIdJson(1);
@@ -39,7 +38,6 @@ public class GetBookByIdTest extends TestBase {
                 "Expected Content-Type to contain API version v=1.0, but was: " + contentType);
     }
 
-    // ---- Parameterized: numeric ids (happy + 404s) ----
     @Test(
         dataProvider = "bookIdNumericCases",
         dataProviderClass = BookDataProviders.class,
@@ -55,7 +53,6 @@ public class GetBookByIdTest extends TestBase {
         }
     }
 
-    // ---- Parameterized: non-numeric ids -> 400 + errors.<key> ----
     @Test(
         dataProvider = "bookIdStringCases",
         dataProviderClass = BookDataProviders.class,
