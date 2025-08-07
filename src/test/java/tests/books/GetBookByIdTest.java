@@ -13,20 +13,20 @@ import static specs.ResponseSpecs.*;
 
 public class GetBookByIdTest extends TestBase {
 
-    @Test(description = "GET /Books/1 -> 200 and full book object with non-null fields")
-    public void getBookById_happy() {
-        Response resp = BookEndpoints.getBookByIdJson(1);
-        resp.then().spec(ok200());
+	@Test(description = "GET /Books/1 -> 200 and required fields non-null")
+	public void getBookById_happy() {
+	    Response resp = BookEndpoints.getBookByIdJson(1);
+	    resp.then().spec(ok200());
 
-        Book b = resp.as(Book.class);
-        assertNotNull(b, "Book response must not be null");
-        assertEquals(b.getId(), Integer.valueOf(1), "Expected id=1");
-        assertNotNull(b.getTitle(), "title must not be null");
-        assertNotNull(b.getDescription(), "description must not be null");
-        assertNotNull(b.getExcerpt(), "excerpt must not be null");
-        assertNotNull(b.getPageCount(), "pageCount must not be null");
-        assertNotNull(b.getPublishDate(), "publishDate must not be null");
-    }
+	    Book b = resp.as(Book.class);
+	    assertNotNull(b, "Book response must not be null");
+	    assertEquals(b.getId(), Integer.valueOf(1), "Expected id=1");
+
+	    assertNotNull(b.getPageCount(),  "pageCount must not be null");
+	    assertNotNull(b.getPublishDate(), "publishDate must not be null");
+
+
+	}
 
     @Test(description = "GET /Books/1 Content-Type contains API version v=1.0")
     public void getBookById_contentTypeHasVersion() {

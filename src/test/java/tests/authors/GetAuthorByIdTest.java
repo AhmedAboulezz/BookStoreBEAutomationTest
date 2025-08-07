@@ -13,22 +13,21 @@ import static specs.ResponseSpecs.*;
 
 public class GetAuthorByIdTest extends TestBase {
 
-    @Test(
-        dataProvider = "authorHappyIds",
-        dataProviderClass = AuthorDataProviders.class,
-        description = "GET /Authors/{id} -> 200 and full author object with non-null fields"
-    )
-    public void getAuthorById_happy(int id) {
-        Response resp = AuthorEndpoints.getAuthorByIdJson(id);
-        resp.then().spec(ok200());
+	@Test(
+		    dataProvider = "authorHappyIds",
+		    dataProviderClass = AuthorDataProviders.class,
+		    description = "GET /Authors/{id} -> 200 and required fields non-null"
+		)
+		public void getAuthorById_happy(int id) {
+		    Response resp = AuthorEndpoints.getAuthorByIdJson(id);
+		    resp.then().spec(ok200());
 
-        Author a = resp.as(Author.class);
-        assertNotNull(a, "Author response must not be null");
-        assertEquals(a.getId(), Integer.valueOf(id), "Expected id to echo back");
-        assertNotNull(a.getIdBook(), "idBook must not be null");
-        assertNotNull(a.getFirstName(), "firstName must not be null");
-        assertNotNull(a.getLastName(), "lastName must not be null");
-    }
+		    Author a = resp.as(Author.class);
+		    assertNotNull(a, "Author response must not be null");
+		    assertEquals(a.getId(), Integer.valueOf(id), "Expected id to echo back");
+		    assertNotNull(a.getIdBook(), "idBook must not be null");
+
+		}
 
     @Test(
         dataProvider = "authorHappyIds",

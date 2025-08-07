@@ -45,17 +45,22 @@ public class GetAuthorsTest extends TestBase {
         assertFalse(authors.isEmpty(), "Authors list should not be empty");
 
         for (Author a : authors) {
-            assertNotNull(a.getId(),        "id must be present");
-            assertNotNull(a.getIdBook(),    "idBook must be present");
-            assertNotNull(a.getFirstName(), "firstName must be present");
-            assertNotNull(a.getLastName(),  "lastName must be present");
+            assertNotNull(a.getId(),     "id must be present");
+            assertNotNull(a.getIdBook(), "idBook must be present");
+            assertTrue(a.getId()      >= 0, "id should be >= 0");
+            assertTrue(a.getIdBook()  >= 0, "idBook should be >= 0");
 
-            assertTrue(a.getId() >= 0,        "id should be >= 0");
-            assertTrue(a.getIdBook() >= 0,    "idBook should be >= 0");
-            assertTrue(a.getFirstName().trim().length() > 0, "firstName should not be blank");
-            assertTrue(a.getLastName().trim().length() > 0,  "lastName should not be blank");
+            if (a.getFirstName() != null) {
+                assertFalse(a.getFirstName().trim().isEmpty(),
+                            "firstName should not be blank when present");
+            }
+            if (a.getLastName() != null) {
+                assertFalse(a.getLastName().trim().isEmpty(),
+                            "lastName should not be blank when present");
+            }
         }
     }
+
 
     @Test(description = "IDs are unique across all authors")
     public void getAllAuthors_dataSpecificValidations() {

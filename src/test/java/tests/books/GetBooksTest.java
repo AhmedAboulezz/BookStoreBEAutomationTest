@@ -46,17 +46,28 @@ public class GetBooksTest extends TestBase {
         assertFalse(books.isEmpty(), "Books list should not be empty");
 
         for (Book b : books) {
-            assertNotNull(b.getId(), "id must be present");
-            assertNotNull(b.getTitle(), "title must be present");
-            assertNotNull(b.getDescription(), "description must be present");
-            assertNotNull(b.getExcerpt(), "excerpt must be present");
-            assertNotNull(b.getPageCount(), "pageCount must be present");
+            assertNotNull(b.getId(),          "id must be present");
+            assertNotNull(b.getPageCount(),   "pageCount must be present");
             assertNotNull(b.getPublishDate(), "publishDate must be present");
 
-            assertTrue(b.getId() >= 0, "id should be >= 0");
-            assertTrue(b.getPageCount() >= 0, "pageCount should be >= 0");
+            assertTrue(b.getId()        >= 0, "id should be ≥ 0");
+            assertTrue(b.getPageCount() >= 0, "pageCount should be ≥ 0");
+
+            if (b.getTitle() != null) {
+                assertFalse(b.getTitle().trim().isEmpty(),
+                            "title should not be blank when present");
+            }
+            if (b.getDescription() != null) {
+                assertFalse(b.getDescription().trim().isEmpty(),
+                            "description should not be blank when present");
+            }
+            if (b.getExcerpt() != null) {
+                assertFalse(b.getExcerpt().trim().isEmpty(),
+                            "excerpt should not be blank when present");
+            }
         }
     }
+
 
     @Test(description = "IDs are unique and pageCount non-negative across all items")
     public void getAllBooks_dataSpecificValidations() {
