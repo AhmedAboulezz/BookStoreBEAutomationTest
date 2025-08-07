@@ -1,67 +1,51 @@
 package base;
 
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.*;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
+import org.testng.*;
 
-import java.util.Arrays;
-
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestResult;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ExtentTestListener implements ITestListener {
 
     private static ExtentReports extent;
-    private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
+    private static final ThreadLocal<ExtentTest> node = new ThreadLocal<>();
+
+    private static final Map<String, ExtentTest> classParents = new ConcurrentHashMap<>();
 
     @Override
-    public void onStart(ITestContext context) {
-        ExtentSparkReporter sparkReporter = new ExtentSparkReporter("test-output/ExtentReport.html");
-        sparkReporter.config().setDocumentTitle("Bookstore API Report");
-        sparkReporter.config().setReportName("API Test Results");
-        sparkReporter.config().setTheme(Theme.STANDARD);
+    public void onStart(ITestContext ctx) {
+        ExtentSparkReporter spark = new ExtentSparkReporter("test-output/ExtentReport.html");
+        spark.config().setTheme(Theme.STANDARD);
+        spark.config().setReportName("Bookstore API Tests");
+        spark.config().setDocumentTitle("Bookstore API Report");
 
         extent = new ExtentReports();
-        extent.attachReporter(sparkReporter);
+        extent.attachReporter(spark);
         extent.setSystemInfo("Tester", "Ahmed Aboelezz");
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (extent != null) {
-                extent.flush();
-            }
-        }));
-    }
-    
-    @Override
-    public void onTestStart(ITestResult result) {
-        ExtentTest extentTest = extent.createTest(result.getMethod().getMethodName());
-        test.set(extentTest);
+        Runtime.getRuntime().addShutdownHook(new Thread(extent::flush));
     }
 
     @Override
-    public void onTestSuccess(ITestResult result) {
-        test.get().log(Status.PASS, "Test Passed");
+    public void onTestStart(ITestResult res) {
+        String className  = res.getTestClass().getRealClass().getSimpleName();
+        String methodName = res.getMethod().getMethodName();
+
+        ExtentTest parent = classParents.computeIfAbsent(className,
+                cn -> extent.createTest(cn));          
+
+        ExtentTest child = parent.createNode(methodName);
+        node.set(child);
     }
 
-    @Override
-    public void onTestFailure(ITestResult result) {
-        test.get().log(Status.FAIL, "Test Failed: " + result.getThrowable());
-    }
+    @Override public void onTestSuccess (ITestResult r){ node.get().pass("Passed"); }
+    @Override public void onTestFailure (ITestResult r){ node.get().fail(r.getThrowable()); }
+    @Override public void onTestSkipped (ITestResult r){ node.get().skip(r.getThrowable()); }
 
-    @Override
-    public void onTestSkipped(ITestResult result) {
-        test.get().log(Status.SKIP, "Test Skipped: " + result.getThrowable());
-    }
+    @Override public void onFinish(ITestContext ctx){ extent.flush(); }
 
-    @Override
-    public void onFinish(ITestContext context) {
-        extent.flush();
-    }
-    
-    public static ExtentTest getTest() {
-        return test.get();
-    }
+    public static ExtentTest current(){ return node.get(); }
 }
