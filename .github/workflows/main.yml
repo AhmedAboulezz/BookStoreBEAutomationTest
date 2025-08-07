@@ -40,3 +40,18 @@ jobs:
         with:
           name: ExtentReport
           path: ./ExtentReport.html
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Add link to summary
+        run: |
+          echo "### [View Extent Report](${{ steps.deploy.outputs.page_url }})" >> $GITHUB_STEP_SUMMARY
